@@ -1,0 +1,90 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+// Определение максимального размера стека
+#define MAXSIZE 10
+
+int stack[MAXSIZE];
+int top = -1;
+
+// Проверка пустоты стека
+int isEmpty() {
+    return top == -1;
+}
+
+// Проверка заполненности стека
+int isFull() {
+    return top == MAXSIZE - 1;
+}
+
+// Удаление элемента из стека
+int pop() {
+    if (!isEmpty()) {
+        return stack[top--];
+    } else {
+        fprintf(stderr, "Стек пустой.\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
+// Добавление элемента в стек
+void push(int data) {
+    if (!isFull()) {
+        stack[++top] = data;
+    } else {
+        fprintf(stderr, "Стек переполнен.\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
+// Главная функция для вычисления выражения в обратной польской записи
+int main() {
+    FILE *file = fopen("file.txt", "r");
+    if (!file) {
+        perror("Ошибка при открытии файла");
+        return EXIT_FAILURE;
+    }
+
+    char ch;
+    while ((ch = fgetc(file)) != EOF) {
+        if (isspace(ch)) {
+            continue; // Пропускаем пробельные символы
+        } else if (isdigit(ch)) {
+            push(ch - '0'); // Преобразуем символ в число и помещаем в стек
+        } else {
+            int a = pop();
+            int b = pop();
+            int result;
+            switch (ch) {
+                case '+': result = b + a; break;
+                case '-': result = b - a; break;
+                case '*': result = b * a; break;
+                case '/':
+                    if (a == 0) {
+                        fprintf(stderr, "Деление на ноль.\n");
+                        fclose(file);
+                        return EXIT_FAILURE;
+                    }
+                    result = b / a;
+                    break;
+                default:
+                    fprintf(stderr, "Некорректный оператор: %c\n", ch);
+                    fclose(file);
+                    return EXIT_FAILURE;
+            }
+            push(result);
+        }
+    }
+
+    int res = pop();
+    if (!isEmpty()) {
+        fprintf(stderr, "Некорректное выражение.\n");
+        fclose(file);
+        return EXIT_FAILURE;
+    }
+    
+    printf("Результат: %d\n", res);
+    fclose(file);
+    return EXIT_SUCCESS;
+}
