@@ -1,0 +1,62 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define STACK_MAX_SIZE 20
+#define STACK_EMPTY -1
+#define STACK_OVERFLOW -100
+
+typedef int T;
+
+typedef struct {
+    T data[STACK_MAX_SIZE];
+    size_t size;
+} Stack;
+
+void push(Stack *stack, T value) {
+    if (stack->size >= STACK_MAX_SIZE) {
+        fprintf(stderr, "Переполнение стека!\n");
+        exit(STACK_OVERFLOW);
+    }
+    stack->data[stack->size++] = value;
+}
+
+T pop(Stack *stack) {
+    if (stack->size == 0) {
+        fprintf(stderr, "Стек пуст!\n");
+        exit(STACK_EMPTY);
+    }
+    return stack->data[--stack->size];
+}
+
+void printStack(const Stack *stack) {
+    printf("Стек [%ld]: ", stack->size);
+    for (size_t i = 0; i < stack->size; i++) {
+        printf("%d ", stack->data[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    Stack stack = { .size = 0 };
+
+    push(&stack, 3);
+    printStack(&stack);
+
+    push(&stack, 5);
+    printStack(&stack);
+
+    push(&stack, 7);
+    printStack(&stack);
+
+    printf("Извлечение: %d\n", pop(&stack));
+    printStack(&stack);
+    printf("Извлечение: %d\n", pop(&stack));
+    printStack(&stack);
+    printf("Извлечение: %d\n", pop(&stack));
+    
+
+    push(&stack, 3);
+    printStack(&stack);
+
+    return EXIT_SUCCESS;
+}
