@@ -1,0 +1,52 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Product {
+    char name[100];
+    float price;
+};
+
+int compareProducts(const void *a, const void *b) {
+    struct Product *productA = (struct Product *)a;
+    struct Product *productB = (struct Product *)b;
+    if (productA->price > productB->price) return 1;
+    if (productA->price < productB->price) return -1;
+    return 0;
+}
+
+int main() {
+    FILE *fileInput, *fileOutput;
+    struct Product products[100];
+    int productCount = 0;
+
+    fileInput = fopen("file.txt", "r");
+    if (!fileInput) {
+        perror("Ошибка при открытии файла file.txt");
+        return EXIT_FAILURE;
+    }
+
+    fileOutput = fopen("file(sort).txt", "w");
+    if (!fileOutput) {
+        perror("Ошибка при открытии файла file(sort).txt");
+        fclose(fileInput);
+        return EXIT_FAILURE;
+    }
+
+    while (fscanf(fileInput, "%99s %f", products[productCount].name, &products[productCount].price) == 2) {
+        if (++productCount >= 100) {
+            fprintf(stderr, "Достигнуто максимальное количество товаров. Некоторые товары могут быть не отсортированы.\n");
+            break;
+        }
+    }
+
+    qsort(products, productCount, sizeof(struct Product), compareProducts);
+
+    for (int i = 0; i < productCount; i++) {
+        fprintf(fileOutput, "%s %.2f\n", products[i].name, products[i].price);
+    }
+
+    fclose(fileOutput);
+    fclose(fileInput);
+
+    return EXIT_SUCCESS;
+}
