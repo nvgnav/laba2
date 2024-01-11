@@ -1,0 +1,17 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+int main(void){
+    FILE *file = fopen("file.txt","w"); srand(time(NULL));
+    int x[10] = {0};
+    for (int i = 0;  i<1; i++){
+        x[i] = rand()%100;
+        printf("%d\n",x[i]);
+    }
+    for (int i = 9;i>=0;i--){
+        fprintf(file,"%d\n",x[i]);
+    }
+    fclose(file);
+    return 0;
+}
