@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+double generateRandom(double ar1, double ar2); 
+void printArray(const float* array, int size); 
+
+int main() {
+    srand((unsigned int)time(0)); 
+    int size;
+    double ar1, ar2;
+
+    printf("Введите размер массива: ");
+    scanf("%d", &size);
+
+    printf("Введите нижнюю границу: ");
+    scanf("%lf", &ar1);
+
+    printf("Введите верхнюю границу: ");
+    scanf("%lf", &ar2);
+
+    while (ar1 >= ar2) {
+        printf("Нижняя граница должна быть меньше верхней. Попробуйте еще раз.\n");
+
+        printf("Введите нижнюю границу: ");
+        scanf("%lf", &ar1);
+
+        printf("Введите верхнюю границу: ");
+        scanf("%lf", &ar2);
+    }
+
+    float* array = (float*)malloc(size * sizeof(float));
+    if(array == NULL) {
+        fprintf(stderr, "Memory allocation failed.\n");
+        return EXIT_FAILURE;
+    }
+
+    for (int i = 0; i < size; i++) {
+        array[i] = (float)generateRandom(ar1, ar2);
+    }
+
+    printArray(array, size);
+    free(array);
+    return EXIT_SUCCESS;
+}
+
+void printArray(const float* array, int size) {
+    for (int i = 0; i < size; i++) {
+        printf("%.2f ", array[i]); 
+    }
+    printf("\n");
+}
+
+double generateRandom(double ar1, double ar2) {
+    return (ar2 - ar1) * ((double)rand() / RAND_MAX) + ar1; 
+}
