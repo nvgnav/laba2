@@ -1,0 +1,103 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <stdbool.h>
+
+#define MAXSIZE 10 // Определяем максимальный размер стека
+
+int stack[MAXSIZE]; // Стек для хранения чисел
+int top = -1; // Индекс вершины стека
+
+// Функция проверки, пуст ли стек
+bool isEmpty() {
+    return top == -1;
+}
+
+// Функция проверки, полон ли стек
+bool isFull() {
+    return top == (MAXSIZE - 1);
+}
+
+// Функция добавления элемента в стек
+void push(int data) {
+    if (isFull()) {
+        printf("Стек переполнен.\n");
+        exit(EXIT_FAILURE);
+    }
+    stack[++top] = data;
+}
+
+// Функция удаления элемента из стека
+int pop() {
+    if (isEmpty()) {
+        printf("Стек пустой.\n");
+        exit(EXIT_FAILURE);
+    }
+    return stack[top--];
+}
+
+// Функция для проверки, является ли символ оператором
+bool isOperator(char symbol) {
+    return symbol == '+' || symbol == '-' || symbol == '*' || symbol == '/';
+}
+
+// Функция получения приоритета оператора
+int getPriority(char symbol) {
+    switch (symbol) {
+        case '*':
+        case '/':
+            return 2;
+        case '+':
+        case '-':
+            return 1;
+        default:
+            return 0; // Если символ не является оператором
+    }
+}
+
+// Функция преобразования инфиксной записи в постфиксную
+void infixToPostfix(const char *infix, char *postfix) {
+    int i = 0, j = 0;
+    char symbol, item;
+    push('('); // Добавляем открывающую скобку в стек
+    strcat(infix, ")"); // Добавляем закрывающую скобку к выражению
+
+    symbol = infix[i];
+    while (symbol != '\0') {
+        if (symbol == '(') {
+            push(symbol);
+        } else if (isdigit(symbol) || symbol == '.') {
+            postfix[j++] = symbol;
+        } else if (isOperator(symbol)) {
+            item = pop();
+            while (isOperator(item) && getPriority(item) >= getPriority(symbol)) {
+                postfix[j++] = item;
+                item = pop();
+            }
+            push(item);
+            push(symbol);
+        } else if (symbol == ')') {
+            item = pop();
+            while (item != '(') {
+                postfix[j++] = item;
+                item = pop();
+            }
+        }
+        symbol = infix[++i]; // Следующий символ входной строки
+    }
+    postfix[j] = '\0'; // Конец строки в постфиксном выражении
+}
+
+int main() {
+    char infix[MAXSIZE], postfix[MAXSIZE];
+
+    printf("Введите инфиксное выражение: ");
+    fgets(infix, sizeof(infix), stdin); // Используем fgets вместо gets для безопасности
+    infix[strcspn(infix, "\n")] = 0; // Удаляем символ новой строки
+    infixToPostfix(infix, postfix);
+    printf("Постфиксное выражение: %s\n", postfix);
+
+    return 0;
+}
+
